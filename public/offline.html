@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Offline - PetAdopt</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(160deg, #f4a30e 0%, #e4dcdc 60%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .card {
+      background: white;
+      border: 4px solid black;
+      border-radius: 24px;
+      box-shadow: 8px 8px 0px black;
+      padding: 48px 40px;
+      max-width: 480px;
+      width: 100%;
+      text-align: center;
+      animation: pop-in 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes pop-in {
+      from { transform: scale(0.8); opacity: 0; }
+      to   { transform: scale(1);   opacity: 1; }
+    }
+
+    .paw {
+      font-size: 72px;
+      margin-bottom: 16px;
+      display: block;
+      animation: sway 2s ease-in-out infinite;
+    }
+
+    @keyframes sway {
+      0%, 100% { transform: rotate(-5deg); }
+      50%       { transform: rotate(5deg);  }
+    }
+
+    .badge-offline {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #fef3c7;
+      border: 2px solid #f4a30e;
+      border-radius: 999px;
+      padding: 4px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #92400e;
+      margin-bottom: 20px;
+    }
+
+    .dot {
+      width: 8px; height: 8px;
+      background: #f4a30e;
+      border-radius: 50%;
+      animation: pulse 1.2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: 0.4; transform: scale(0.7); }
+    }
+
+    h1 {
+      font-size: 28px;
+      font-weight: 800;
+      color: #111;
+      margin-bottom: 12px;
+    }
+
+    p {
+      font-size: 16px;
+      color: #555;
+      line-height: 1.7;
+      margin-bottom: 32px;
+    }
+
+    .btn-primary {
+      display: inline-block;
+      background: #754907;
+      color: white;
+      border: 3px solid black;
+      border-radius: 12px;
+      padding: 14px 32px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      box-shadow: 4px 4px 0 black;
+      transition: transform 0.1s, box-shadow 0.1s;
+      margin-bottom: 12px;
+      width: 100%;
+    }
+
+    .btn-primary:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: 6px 6px 0 black;
+    }
+
+    .btn-primary:active {
+      transform: translate(2px, 2px);
+      box-shadow: 2px 2px 0 black;
+    }
+
+    .btn-secondary {
+      display: inline-block;
+      background: white;
+      color: black;
+      border: 3px solid black;
+      border-radius: 12px;
+      padding: 14px 32px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      box-shadow: 4px 4px 0 black;
+      transition: transform 0.1s, box-shadow 0.1s;
+      width: 100%;
+    }
+
+    .btn-secondary:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: 6px 6px 0 black;
+      background: #f4a30e;
+    }
+
+    .divider {
+      border: none;
+      border-top: 2px dashed #ddd;
+      margin: 24px 0;
+    }
+
+    .tips {
+      text-align: left;
+      background: #f9f9f9;
+      border: 2px solid #eee;
+      border-radius: 12px;
+      padding: 16px;
+      margin-top: 24px;
+    }
+
+    .tips h3 {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #888;
+      margin-bottom: 10px;
+    }
+
+    .tips li {
+      font-size: 14px;
+      color: #555;
+      line-height: 1.8;
+      margin-left: 16px;
+    }
+
+    #status-msg {
+      margin-top: 16px;
+      font-size: 14px;
+      color: #754907;
+      font-weight: 600;
+      min-height: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <span class="paw">🐾</span>
+
+    <div class="badge-offline">
+      <span class="dot"></span>
+      Sem conexão
+    </div>
+
+    <h1>Você está Offline</h1>
+    <p>
+      Não foi possível conectar à internet. Tente verificar sua conexão Wi-Fi ou dados móveis.
+    </p>
+
+    <button class="btn-primary" onclick="tryReconnect()">
+      🔄 Tentar Novamente
+    </button>
+
+    <a href="/" class="btn-secondary">
+      🏠 Ir para o Início
+    </a>
+
+    <p id="status-msg"></p>
+
+    <hr class="divider" />
+
+    <div class="tips">
+      <h3>💡 Enquanto isso...</h3>
+      <ul>
+        <li>Páginas já visitadas ficam disponíveis</li>
+        <li>Cadastros são salvos e sincronizados depois</li>
+        <li>Seu app continua funcional no modo offline</li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    function tryReconnect() {
+      const msg = document.getElementById('status-msg');
+      msg.textContent = 'Verificando conexão...';
+
+      fetch('/', { method: 'HEAD', cache: 'no-store' })
+        .then(() => {
+          msg.textContent = '✅ Conectado! Redirecionando...';
+          setTimeout(() => window.location.href = '/', 800);
+        })
+        .catch(() => {
+          msg.textContent = '❌ Ainda sem conexão. Tente novamente.';
+        });
+    }
+
+    // Redireciona automaticamente quando voltar online
+    window.addEventListener('online', () => {
+      document.getElementById('status-msg').textContent = '✅ Conexão restaurada! Redirecionando...';
+      setTimeout(() => window.location.href = '/', 1000);
+    });
+  </script>
+</body>
+</html>

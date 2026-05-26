@@ -1,0 +1,18 @@
+{
+  "name": "PetAdopt - Adoção de Animais",
+  "short_name": "PetAdopt",
+  "description": "Encontre seu novo melhor amigo",
+  "start_url": "/SystemAdocaoPets/",
+  "scope": "/SystemAdocaoPets/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#f4a30e",
+  "icons": [
+    {
+      "src": "/SystemAdocaoPets/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
