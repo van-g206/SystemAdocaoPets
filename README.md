@@ -24,4 +24,5 @@
 
 ## 📖 Sobre o Projeto
 
-O **PetAdopt** é uma plataforma desenvolvida para conectar animais resgatados a pessoas que buscam um novo companheiro. Com uma interface moderna e fluida, o sistema facilita o processo de visualização e triagem para adoção responsável.
+O **PetAdopt** é uma plataforma (protótipo) desenvolvida para conectar animais resgatados a pessoas que buscam um novo companheiro. Com uma interface moderna e fluida, o sistema facilita o processo de visualização e triagem para adoção responsável.
+- Este projeto foi desenvolvido exclusivamente para fins acadêmicos e representa um protótipo funcional, não sendo o produto final❗❗❗
