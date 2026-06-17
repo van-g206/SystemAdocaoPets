@@ -153,7 +153,6 @@ export function Layout({ children }: LayoutProps) {
                             transition-all
                             duration-300
                             active:scale-95
-
                             ${
                               isActive(link.to)
                                 ? 'bg-amber-500 text-white shadow-lg'
@@ -179,51 +178,9 @@ export function Layout({ children }: LayoutProps) {
         {children}
       </main>
 
-      {/* MOBILE FLOATING NAV */}
-      <div className="md:hidden fixed bottom-4 left-1/2 -translate-x-1/2 z-50">
-        <div
-          className="
-            flex items-center gap-1
-            rounded-full
-            border border-white/40
-            bg-white/80
-            backdrop-blur-xl
-            shadow-2xl
-            px-2
-            py-2
-          "
-        >
-          {navLinks.map((link) => (
-            <Link key={link.to} to={link.to}>
-              <Button
-                size="icon"
-                variant="ghost"
-                className={`
-                  h-12
-                  w-12
-                  rounded-full
-                  transition-all
-                  duration-300
-                  active:scale-95
-
-                  ${
-                    isActive(link.to)
-                      ? 'bg-amber-500 text-white shadow-md'
-                      : 'text-slate-600 hover:bg-amber-100'
-                  }
-                `}
-              >
-                <link.icon className="size-5" />
-              </Button>
-            </Link>
-          ))}
-        </div>
-      </div>
-
       {/* FOOTER */}
       <footer className="mt-auto bg-gradient-to-r from-slate-900 via-zinc-900 to-slate-800 text-white py-12">
         <div className="container mx-auto px-4">
-          {/* TOPO */}
           <div className="flex flex-col items-center text-center mb-10">
             <PawPrint className="size-10 text-amber-400 mb-4" />
 
@@ -236,7 +193,6 @@ export function Layout({ children }: LayoutProps) {
             </p>
           </div>
 
-          {/* GRID */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
             <div>
               <h4 className="font-semibold mb-3">
@@ -274,7 +230,6 @@ export function Layout({ children }: LayoutProps) {
             </div>
           </div>
 
-          {/* COPYRIGHT */}
           <div className="mt-10 border-t border-white/10 pt-6 text-center text-white/50 text-sm">
             © 2026 PetAdopt. Todos os direitos reservados.
           </div>
