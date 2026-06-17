@@ -74,12 +74,14 @@ export function usePWA() {
 
     if ('serviceWorker' in navigator) {
       const reg = await navigator.serviceWorker.ready;
+      // vibrate é suportado pela API de Service Worker mas não está no tipo NotificationOptions do DOM
       reg.showNotification(title, {
         icon: '/icon.svg',
         badge: '/icon.svg',
+        ...(options as object),
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         vibrate: [200, 100, 200],
-        ...options,
-      });
+      } as NotificationOptions);
     } else {
       new Notification(title, { icon: '/icon.svg', ...options });
     }
@@ -105,7 +107,7 @@ export function usePWA() {
 
       const subscription = await reg.pushManager.subscribe({
         userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
+        applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY) as unknown as ArrayBuffer,
       });
 
       console.log('Push subscription:', JSON.stringify(subscription));

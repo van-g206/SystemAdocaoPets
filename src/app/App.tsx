@@ -11,6 +11,9 @@ import { AddPetPage } from './pages/AddPetPage';
 import { InstallPrompt } from './components/InstallPrompt';
 import { OfflineIndicator } from './components/OfflineIndicator';
 import { NotificationPrompt } from './components/NotificationPrompt';
+import { AuthProvider } from './context/AuthContext';
+import { PetsProvider } from './context/PetsContext';
+import { FavoritesProvider } from './context/FavoritesContext';
 
 export default function App() {
   useEffect(() => {
@@ -29,30 +32,36 @@ export default function App() {
   }, []);
 
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/login" element={<LoginPage />} />
-        <Route
-          path="/*"
-          element={
-            <Layout>
-              <Routes>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/pets" element={<PetsPage />} />
-                <Route path="/pets/:id" element={<PetDetailPage />} />
-                <Route path="/add-pet" element={<AddPetPage />} />
-                <Route path="/favorites" element={<FavoritesPage />} />
-              </Routes>
-            </Layout>
-          }
-        />
-      </Routes>
+    <AuthProvider>
+      <PetsProvider>
+        <FavoritesProvider>
+          <BrowserRouter>
+            <Routes>
+              <Route path="/login" element={<LoginPage />} />
+              <Route
+                path="/*"
+                element={
+                  <Layout>
+                    <Routes>
+                      <Route path="/" element={<HomePage />} />
+                      <Route path="/pets" element={<PetsPage />} />
+                      <Route path="/pets/:id" element={<PetDetailPage />} />
+                      <Route path="/add-pet" element={<AddPetPage />} />
+                      <Route path="/favorites" element={<FavoritesPage />} />
+                    </Routes>
+                  </Layout>
+                }
+              />
+            </Routes>
 
-      {/* Componentes PWA globais */}
-      <InstallPrompt />
-      <OfflineIndicator />
-      <NotificationPrompt />
-      <Toaster position="top-center" />
-    </BrowserRouter>
+            {/* Componentes PWA globais */}
+            <InstallPrompt />
+            <OfflineIndicator />
+            <NotificationPrompt />
+            <Toaster position="top-center" />
+          </BrowserRouter>
+        </FavoritesProvider>
+      </PetsProvider>
+    </AuthProvider>
   );
 }

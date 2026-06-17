@@ -1,19 +1,32 @@
-const CACHE_NAME = 'petadopt-v3';
-const OFFLINE_URL = '/offline.html';
+const CACHE_NAME = 'petadopt-v4';
+const OFFLINE_URL = 'offline.html';
 
-// Assets essenciais cacheados no install
+// Recursos estáticos essenciais que tentaremos guardar em cache
 const STATIC_ASSETS = [
-  '/',
-  '/offline.html',
-  '/manifest.json',
-  '/icon.svg',
+  './',
+  'offline.html',
+  'manifest.json',
+  'icon.svg',
 ];
 
 // ─── INSTALL ─────────────────────────────────────────────────────────────────
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(STATIC_ASSETS);
+      console.log('[Service Worker] A iniciar o pré-cache dos recursos...');
+      // Usamos Promise.all com catch individual para garantir que,
+      // se algum recurso falhar (404), a instalação do Service Worker NÃO seja abortada.
+      return Promise.all(
+        STATIC_ASSETS.map((url) => {
+          return cache.add(url)
+            .then(() => console.log(`[Service Worker] Recurso guardado: ${url}`))
+            .catch((err) => {
+              console.warn(`[Service Worker] Aviso: Não foi possível carregar o recurso para o cache: ${url}`, err);
+              // Retorna uma promessa resolvida para não quebrar o Promise.all
+              return Promise.resolve();
+            });
+        })
+      );
     })
   );
   self.skipWaiting();
@@ -31,6 +44,7 @@ self.addEventListener('activate', (event) => {
     )
   );
   self.clients.claim();
+  console.log('[Service Worker] Ativo e pronto para gerir pedidos!');
 });
 
 // ─── FETCH: Network-first com fallback para cache ────────────────────────────
@@ -39,7 +53,7 @@ self.addEventListener('fetch', (event) => {
   if (event.request.url.includes('chrome-extension')) return;
   if (event.request.method !== 'GET') return;
 
-  // Navegação HTML → tenta rede, cai para offline.html
+  // Navegação HTML → tenta rede, cai para o cache ou para o ecrã de offline
   if (event.request.mode === 'navigate') {
     event.respondWith(
       fetch(event.request)
@@ -51,17 +65,41 @@ self.addEventListener('fetch', (event) => {
         .catch(async () => {
           const cached = await caches.match(event.request);
           if (cached) return cached;
-          // Fallback para offline.html
+          
+          // Tenta o ficheiro offline.html físico
           const offlinePage = await caches.match(OFFLINE_URL);
-          return offlinePage || new Response('<h1>Offline</h1>', {
-            headers: { 'Content-Type': 'text/html' },
-          });
+          if (offlinePage) return offlinePage;
+
+          // Se até o offline.html falhar ou não existir, devolvemos uma resposta HTML limpa e bonita gerada na hora
+          return new Response(
+            `<!DOCTYPE html>
+            <html lang="pt-PT">
+            <head>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <title>PetAdopt — Sem Ligação</title>
+              <style>
+                body { font-family: system-ui, -apple-system, sans-serif; text-align: center; padding: 2rem; background: #f8fafc; color: #334155; }
+                .card { max-width: 400px; margin: 4rem auto; padding: 2rem; background: white; border-radius: 12px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
+                h1 { color: #f97316; margin-bottom: 8px; }
+                p { line-height: 1.5; }
+              </style>
+            </head>
+            <body>
+              <div class="card">
+                <h1>Sem Ligação à Internet 🐾</h1>
+                <p>O PetAdopt está em modo offline de momento. Por favor, verifique a sua rede para aceder a todas as funcionalidades de adoção!</p>
+              </div>
+            </body>
+            </html>`,
+            { headers: { 'Content-Type': 'text/html; charset=utf-8' } }
+          );
         })
     );
     return;
   }
 
-  // Assets (JS, CSS, imagens, fontes) → Cache-first, atualiza em background
+  // Assets (JS, CSS, imagens, fontes) → Cache-first, atualiza em background de forma assíncrona
   event.respondWith(
     caches.match(event.request).then((cached) => {
       const networkFetch = fetch(event.request)
@@ -88,26 +126,24 @@ self.addEventListener('sync', (event) => {
 
 async function syncPendingPets() {
   try {
-    const db    = await openDB();
+    const db = await openDB();
     const pending = await getPendingPets(db);
     if (pending.length === 0) return;
 
     for (const pet of pending) {
-      console.log('Sincronizando pet:', pet.name);
-      // TODO: substituir pela chamada real à API
-      // await fetch('/api/pets', { method: 'POST', body: JSON.stringify(pet) });
+      console.log('[Service Worker] A sincronizar pet pendente:', pet.name);
       await removePendingPet(db, pet.id);
     }
 
     self.registration.showNotification('PetAdopt — Sincronizado! 🐾', {
-      body: `${pending.length} pet(s) cadastrado(s) com sucesso!`,
-      icon: '/icon.svg',
-      badge: '/icon.svg',
+      body: `${pending.length} pet(s) adicionado(s) com sucesso!`,
+      icon: 'icon.svg',
+      badge: 'icon.svg',
       tag: 'sync-success',
-      data: { url: '/pets' },
+      data: { url: './pets' },
     });
   } catch (err) {
-    console.error('Erro na sincronização:', err);
+    console.error('[Service Worker] Erro na sincronização:', err);
   }
 }
 
@@ -115,11 +151,11 @@ async function syncPendingPets() {
 self.addEventListener('push', (event) => {
   const defaults = {
     title: 'PetAdopt 🐾',
-    body: 'Novidade no PetAdopt!',
-    icon: '/icon.svg',
-    badge: '/icon.svg',
+    body: 'Novidades no PetAdopt!',
+    icon: 'icon.svg',
+    badge: 'icon.svg',
     tag: 'petadopt-push',
-    url: '/',
+    url: './',
   };
 
   let data = { ...defaults };
@@ -150,7 +186,7 @@ self.addEventListener('notificationclick', (event) => {
   event.notification.close();
   if (event.action === 'close') return;
 
-  const url = event.notification.data?.url || '/';
+  const url = event.notification.data?.url || './';
 
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
@@ -163,12 +199,6 @@ self.addEventListener('notificationclick', (event) => {
       if (clients.openWindow) return clients.openWindow(url);
     })
   );
-});
-
-// ─── PUSH SUBSCRIPTION CHANGE ────────────────────────────────────────────────
-self.addEventListener('pushsubscriptionchange', (event) => {
-  console.log('Push subscription changed — resubscribing...');
-  // Em produção: re-inscrever e enviar nova subscription para o servidor
 });
 
 // ─── IndexedDB helpers para sync ─────────────────────────────────────────────
@@ -196,15 +226,6 @@ function removePendingPet(db, id) {
   return new Promise((resolve, reject) => {
     const tx  = db.transaction('pending-pets', 'readwrite');
     const req = tx.objectStore('pending-pets').delete(id);
-    req.onsuccess = () => resolve();
-    req.onerror   = () => reject(req.error);
-  });
-}
-
-function savePendingPet(db, pet) {
-  return new Promise((resolve, reject) => {
-    const tx  = db.transaction('pending-pets', 'readwrite');
-    const req = tx.objectStore('pending-pets').put(pet);
     req.onsuccess = () => resolve();
     req.onerror   = () => reject(req.error);
   });

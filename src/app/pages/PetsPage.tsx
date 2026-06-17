@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { Link } from 'react-router';
-import { mockPets } from '../data/pets';
+import { usePets } from '../context/PetsContext';
+import { useFavorites } from '../context/FavoritesContext';
 import { Card } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
@@ -9,13 +10,14 @@ import { Badge } from '../components/ui/badge';
 import { Heart, Search, MapPin, Plus } from 'lucide-react';
 
 export function PetsPage() {
+  const { pets } = usePets();
+  const { isFavorite, toggleFavorite } = useFavorites();
   const [searchTerm, setSearchTerm] = useState('');
   const [speciesFilter, setSpeciesFilter] = useState<string>('all');
   const [sizeFilter, setSizeFilter] = useState<string>('all');
-  const [favorites, setFavorites] = useState<Set<string>>(new Set());
 
   const filteredPets = useMemo(() => {
-    return mockPets.filter((pet) => {
+    return pets.filter((pet) => {
       const matchesSearch = pet.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                            pet.breed.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesSpecies = speciesFilter === 'all' || pet.species === speciesFilter;
@@ -23,19 +25,7 @@ export function PetsPage() {
 
       return matchesSearch && matchesSpecies && matchesSize;
     });
-  }, [searchTerm, speciesFilter, sizeFilter]);
-
-  const toggleFavorite = (petId: string) => {
-    setFavorites((prev) => {
-      const newFavorites = new Set(prev);
-      if (newFavorites.has(petId)) {
-        newFavorites.delete(petId);
-      } else {
-        newFavorites.add(petId);
-      }
-      return newFavorites;
-    });
-  };
+  }, [pets, searchTerm, speciesFilter, sizeFilter]);
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-7xl">
@@ -127,13 +117,13 @@ export function PetsPage() {
                   size="icon"
                   variant="ghost"
                   className={`absolute top-2 right-2 rounded-full ${
-                    favorites.has(pet.id)
+                    isFavorite(pet.id)
                       ? 'bg-red-500 text-white hover:bg-red-600'
                       : 'bg-white/90 text-gray-600 hover:bg-white'
                   }`}
-                  onClick={() => toggleFavorite(pet.id)}
+                  onClick={() => toggleFavorite(pet)}
                 >
-                  <Heart className={favorites.has(pet.id) ? 'fill-current' : ''} />
+                  <Heart className={isFavorite(pet.id) ? 'fill-current' : ''} />
                 </Button>
                 <Badge className="absolute top-2 left-2 bg-[#f4a30e] text-black border-black">
                   {pet.species === 'dog' ? '🐕 Cachorro' : '🐱 Gato'}

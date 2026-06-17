@@ -1,17 +1,18 @@
 import { useParams, Link, useNavigate } from 'react-router';
-import { mockPets } from '../data/pets';
+import { usePets } from '../context/PetsContext';
+import { useFavorites } from '../context/FavoritesContext';
 import { Button } from '../components/ui/button';
 import { Card } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
 import { ArrowLeft, Heart, MapPin, Calendar, Ruler, CheckCircle2, XCircle } from 'lucide-react';
-import { useState } from 'react';
 
 export function PetDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [isFavorite, setIsFavorite] = useState(false);
+  const { pets } = usePets();
+  const { isFavorite, toggleFavorite } = useFavorites();
 
-  const pet = mockPets.find((p) => p.id === id);
+  const pet = pets.find((p) => p.id === id);
 
   if (!pet) {
     return (
@@ -51,13 +52,13 @@ export function PetDetailPage() {
               <Button
                 size="lg"
                 className={`absolute top-4 right-4 rounded-full ${
-                  isFavorite
+                  isFavorite(pet.id)
                     ? 'bg-red-500 hover:bg-red-600 text-white'
                     : 'bg-white/90 hover:bg-white text-gray-600'
                 }`}
-                onClick={() => setIsFavorite(!isFavorite)}
+                onClick={() => toggleFavorite(pet)}
               >
-                <Heart className={`size-6 ${isFavorite ? 'fill-current' : ''}`} />
+                <Heart className={`size-6 ${isFavorite(pet.id) ? 'fill-current' : ''}`} />
               </Button>
             </div>
           </div>

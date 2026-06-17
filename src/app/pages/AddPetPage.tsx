@@ -10,6 +10,7 @@ import { Badge } from '../components/ui/badge';
 import { Switch } from '../components/ui/switch';
 import { ArrowLeft, Upload, Save, Wifi, WifiOff } from 'lucide-react';
 import { usePWA } from '../hooks/usePWA';
+import { usePets } from '../context/PetsContext';
 import { toast } from 'sonner';
 
 // Salva o pet pendente no IndexedDB para sync posterior
@@ -33,16 +34,17 @@ async function savePetOffline(pet: object) {
 export function AddPetPage() {
   const navigate = useNavigate();
   const { isOnline, sendLocalNotification } = usePWA();
+  const { addPet } = usePets();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [imagePreview, setImagePreview] = useState<string>('');
 
   const [formData, setFormData] = useState({
     name: '',
-    species: '',
+    species: '' as 'dog' | 'cat' | '',
     breed: '',
     age: '',
-    gender: '',
-    size: '',
+    gender: '' as 'male' | 'female' | '',
+    size: '' as 'small' | 'medium' | 'large' | '',
     description: '',
     personality: '',
     healthStatus: '',
@@ -63,27 +65,52 @@ export function AddPetPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
 
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    if (!formData.species || !formData.gender || !formData.size) {
+      toast.error('Preencha todos os campos obrigatórios.');
+      return;
+    }
+
+    setIsSubmitting(true);
+    await new Promise((resolve) => setTimeout(resolve, 800));
 
     if (isOnline) {
-      // Online: envia normalmente (simulado)
+      // Online: adiciona ao contexto (persiste no localStorage)
+      addPet({
+        name: formData.name,
+        species: formData.species as 'dog' | 'cat',
+        breed: formData.breed || 'SRD',
+        age: Number(formData.age) || 1,
+        gender: formData.gender as 'male' | 'female',
+        size: formData.size as 'small' | 'medium' | 'large',
+        description: formData.description,
+        personality: formData.personality.split(',').map((s) => s.trim()).filter(Boolean),
+        healthStatus: formData.healthStatus || 'Bom',
+        vaccinated: formData.vaccinated,
+        neutered: formData.neutered,
+        image: imagePreview || 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=400&h=300&fit=crop',
+        location: formData.location,
+        adoptionFee: Number(formData.adoptionFee) || 0,
+      });
+
       toast.success('Pet cadastrado com sucesso!', {
         description: 'O animal já está disponível para adoção.',
       });
+
       await sendLocalNotification('🐾 Pet cadastrado!', {
         body: `${formData.name} foi adicionado com sucesso e já aparece na lista!`,
         tag: 'pet-added',
         data: { url: '/pets' },
       });
-      setTimeout(() => navigate('/pets'), 1000);
+
+      setTimeout(() => navigate('/pets'), 800);
     } else {
       // Offline: salva no IndexedDB e registra sync
       try {
         const pendingPet = {
           id: `offline-${Date.now()}`,
           ...formData,
+          image: imagePreview,
           createdAt: new Date().toISOString(),
         };
 
@@ -179,7 +206,7 @@ export function AddPetPage() {
               </div>
               <div className="space-y-2">
                 <Label>Espécie *</Label>
-                <Select value={formData.species} onValueChange={(v) => setFormData({ ...formData, species: v })}>
+                <Select value={formData.species} onValueChange={(v) => setFormData({ ...formData, species: v as 'dog' | 'cat' })}>
                   <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="dog">Cachorro</SelectItem>
@@ -193,11 +220,11 @@ export function AddPetPage() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="age">Idade (anos) *</Label>
-                <Input id="age" type="number" value={formData.age} onChange={(e) => setFormData({ ...formData, age: e.target.value })} placeholder="Ex: 2" required />
+                <Input id="age" type="number" min="0" value={formData.age} onChange={(e) => setFormData({ ...formData, age: e.target.value })} placeholder="Ex: 2" required />
               </div>
               <div className="space-y-2">
                 <Label>Sexo *</Label>
-                <Select value={formData.gender} onValueChange={(v) => setFormData({ ...formData, gender: v })}>
+                <Select value={formData.gender} onValueChange={(v) => setFormData({ ...formData, gender: v as 'male' | 'female' })}>
                   <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="male">Macho</SelectItem>
@@ -207,7 +234,7 @@ export function AddPetPage() {
               </div>
               <div className="space-y-2">
                 <Label>Porte *</Label>
-                <Select value={formData.size} onValueChange={(v) => setFormData({ ...formData, size: v })}>
+                <Select value={formData.size} onValueChange={(v) => setFormData({ ...formData, size: v as 'small' | 'medium' | 'large' })}>
                   <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="small">Pequeno</SelectItem>
@@ -248,7 +275,7 @@ export function AddPetPage() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="adoptionFee">Taxa de Adoção (R$)</Label>
-                <Input id="adoptionFee" type="number" value={formData.adoptionFee} onChange={(e) => setFormData({ ...formData, adoptionFee: e.target.value })} placeholder="Ex: 150" />
+                <Input id="adoptionFee" type="number" min="0" value={formData.adoptionFee} onChange={(e) => setFormData({ ...formData, adoptionFee: e.target.value })} placeholder="Ex: 150" />
               </div>
             </div>
 
