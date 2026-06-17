@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router';
+import { HashRouter, Routes, Route } from 'react-router-dom';
 import { useEffect } from 'react';
 import { Toaster } from './components/ui/sonner';
 import { Layout } from './components/Layout';
@@ -19,8 +19,9 @@ export default function App() {
   useEffect(() => {
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
+        // Caminho relativo: herda o scope da subpasta corretamente no GitHub Pages
         navigator.serviceWorker
-          .register('/sw.js')
+          .register('./sw.js')
           .then((registration) => {
             console.log('Service Worker registrado:', registration);
           })
@@ -35,7 +36,8 @@ export default function App() {
     <AuthProvider>
       <PetsProvider>
         <FavoritesProvider>
-          <BrowserRouter>
+          {/* HashRouter: usa #/ na URL, imune a 404 em subpastas do GitHub Pages */}
+          <HashRouter>
             <Routes>
               <Route path="/login" element={<LoginPage />} />
               <Route
@@ -59,7 +61,7 @@ export default function App() {
             <OfflineIndicator />
             <NotificationPrompt />
             <Toaster position="top-center" />
-          </BrowserRouter>
+          </HashRouter>
         </FavoritesProvider>
       </PetsProvider>
     </AuthProvider>

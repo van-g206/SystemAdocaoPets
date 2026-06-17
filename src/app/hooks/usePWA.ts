@@ -76,14 +76,14 @@ export function usePWA() {
       const reg = await navigator.serviceWorker.ready;
       // vibrate é suportado pela API de Service Worker mas não está no tipo NotificationOptions do DOM
       reg.showNotification(title, {
-        icon: '/icon.svg',
-        badge: '/icon.svg',
+        icon: './icon.svg',
+        badge: './icon.svg',
         ...(options as object),
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         vibrate: [200, 100, 200],
       } as NotificationOptions);
     } else {
-      new Notification(title, { icon: '/icon.svg', ...options });
+      new Notification(title, { icon: './icon.svg', ...options });
     }
   };
 

@@ -1,4 +1,4 @@
-import { useParams, Link, useNavigate } from 'react-router';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { usePets } from '../context/PetsContext';
 import { useFavorites } from '../context/FavoritesContext';
 import { Button } from '../components/ui/button';

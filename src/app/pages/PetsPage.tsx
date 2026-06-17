@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
 import { usePets } from '../context/PetsContext';
 import { useFavorites } from '../context/FavoritesContext';
 import { Card } from '../components/ui/card';

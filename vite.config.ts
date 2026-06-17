@@ -16,6 +16,7 @@ function figmaAssetResolver() {
 }
 
 export default defineConfig({
+  // base relativo: garante que todos os assets funcionam em qualquer subpasta do GitHub Pages
   base: './',
   plugins: [
     figmaAssetResolver(),
@@ -25,6 +26,8 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
+      // Garante que react-router-dom resolve para o mesmo pacote react-router v7
+      'react-router-dom': 'react-router',
     },
   },
   assetsInclude: ['**/*.svg', '**/*.csv'],

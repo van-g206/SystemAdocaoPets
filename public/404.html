@@ -5,9 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>PetAdopt</title>
     <script>
-      // Redireciona para index.html mantendo o path original (truque para SPA no GitHub Pages)
-      sessionStorage.setItem('redirect', window.location.pathname + window.location.search);
-      window.location.replace('/SystemAdocaoPets/');
+      // Com HashRouter, o GitHub Pages nunca mais serve 404 para rotas SPA.
+      // Este ficheiro apenas garante que URLs antigas sem hash são redirecionadas
+      // para a raiz relativa do projeto (funciona independentemente do nome do repo).
+      var l = window.location;
+      var base = l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '');
+      var pathParts = l.pathname.split('/');
+      // Mantém apenas o primeiro segmento (nome do repo no GitHub Pages)
+      var repoPath = pathParts.length > 1 ? '/' + pathParts[1] + '/' : '/';
+      l.replace(base + repoPath);
     </script>
   </head>
   <body>
