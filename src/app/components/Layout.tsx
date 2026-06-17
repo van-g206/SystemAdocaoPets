@@ -1,6 +1,14 @@
 import { ReactNode } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Heart, Home, User, Menu, PawPrint, Plus } from 'lucide-react';
+import {
+  Heart,
+  Home,
+  User,
+  Menu,
+  PawPrint,
+  Plus,
+} from 'lucide-react';
+
 import { Button } from './ui/button';
 import { Sheet, SheetContent, SheetTrigger } from './ui/sheet';
 import { NotificationToggle } from './NotificationPrompt';
@@ -11,67 +19,147 @@ interface LayoutProps {
 
 export function Layout({ children }: LayoutProps) {
   const location = useLocation();
+
   const isActive = (path: string) => location.pathname === path;
 
   const navLinks = [
-    { to: '/',          label: 'Início',    icon: Home     },
-    { to: '/pets',      label: 'Adotar',    icon: PawPrint },
-    { to: '/add-pet',   label: 'Cadastrar', icon: Plus     },
-    { to: '/favorites', label: 'Favoritos', icon: Heart    },
-    { to: '/login',     label: 'Entrar',    icon: User     },
+    {
+      to: '/',
+      label: 'Início',
+      icon: Home,
+    },
+    {
+      to: '/pets',
+      label: 'Adotar',
+      icon: PawPrint,
+    },
+    {
+      to: '/add-pet',
+      label: 'Cadastrar',
+      icon: Plus,
+    },
+    {
+      to: '/favorites',
+      label: 'Favoritos',
+      icon: Heart,
+    },
+    {
+      to: '/login',
+      label: 'Entrar',
+      icon: User,
+    },
   ];
 
   return (
-    <div className="min-h-screen bg-[#e4dcdc] flex flex-col">
-      {/* Header */}
-      <header className="bg-[#f4a30e] border-b-4 border-black shadow-lg sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-amber-50 via-orange-50 to-slate-50">
+      {/* HEADER */}
+      <header className="sticky top-0 z-50 border-b border-white/30 bg-white/70 backdrop-blur-xl shadow-sm">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-between py-4">
+            {/* LOGO */}
+            <Link
+              to="/"
+              className="flex items-center gap-3 transition-all duration-300 hover:scale-[1.02]"
+            >
+              <div className="flex items-center justify-center size-11 rounded-2xl bg-amber-100 shadow-sm">
+                <PawPrint className="size-6 text-amber-500" />
+              </div>
 
-            {/* Logo */}
-            <Link to="/" className="flex items-center gap-2">
-              <PawPrint className="size-8 text-black" />
               <div className="hidden sm:block">
-                <h1 className="font-bold text-2xl text-black">PetAdopt</h1>
-                <p className="text-xs text-black/80">Encontre seu amigo</p>
+                <h1 className="text-2xl font-black bg-gradient-to-r from-amber-500 to-orange-400 bg-clip-text text-transparent">
+                  PetAdopt
+                </h1>
+
+                <p className="text-xs text-slate-500">
+                  Conectando animais e famílias
+                </p>
               </div>
             </Link>
 
-            {/* Desktop Navigation */}
+            {/* DESKTOP NAV */}
             <nav className="hidden md:flex items-center gap-2">
               {navLinks.map((link) => (
                 <Link key={link.to} to={link.to}>
                   <Button
-                    variant={isActive(link.to) ? 'default' : 'ghost'}
-                    className={isActive(link.to) ? 'bg-black text-white' : 'text-black hover:bg-black/10'}
+                    variant="ghost"
+                    className={`
+                      h-12
+                      rounded-full
+                      px-5
+                      transition-all
+                      duration-300
+                      active:scale-95
+                      ${
+                        isActive(link.to)
+                          ? 'bg-amber-500 text-white shadow-lg hover:bg-amber-500'
+                          : 'text-slate-700 hover:bg-amber-100 hover:-translate-y-0.5'
+                      }
+                    `}
                   >
                     <link.icon className="size-4 mr-2" />
                     {link.label}
                   </Button>
                 </Link>
               ))}
-              {/* Botão de notificações na navbar */}
+
               <NotificationToggle />
             </nav>
 
-            {/* Mobile: notificações + menu */}
+            {/* MOBILE */}
             <div className="flex items-center gap-2 md:hidden">
               <NotificationToggle />
+
               <Sheet>
                 <SheetTrigger asChild>
-                  <Button variant="ghost" size="icon" className="text-black">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="rounded-xl text-slate-700 hover:bg-amber-100"
+                  >
                     <Menu className="size-6" />
                   </Button>
                 </SheetTrigger>
-                <SheetContent side="right" className="bg-[#e4dcdc]">
-                  <nav className="flex flex-col gap-4 mt-8">
+
+                <SheetContent
+                  side="right"
+                  className="bg-white/95 backdrop-blur-xl border-l border-white/30"
+                >
+                  {/* TOPO */}
+                  <div className="flex flex-col items-center py-6 border-b">
+                    <div className="size-16 rounded-full bg-amber-100 flex items-center justify-center">
+                      <PawPrint className="size-8 text-amber-500" />
+                    </div>
+
+                    <h2 className="font-bold text-lg mt-4">
+                      PetAdopt
+                    </h2>
+
+                    <p className="text-sm text-slate-500">
+                      Encontre seu novo melhor amigo
+                    </p>
+                  </div>
+
+                  {/* LINKS */}
+                  <nav className="flex flex-col gap-3 mt-6">
                     {navLinks.map((link) => (
                       <Link key={link.to} to={link.to}>
                         <Button
-                          variant={isActive(link.to) ? 'default' : 'ghost'}
-                          className={`w-full justify-start ${
-                            isActive(link.to) ? 'bg-[#f4a30e] text-black' : 'text-black'
-                          }`}
+                          variant="ghost"
+                          className={`
+                            w-full
+                            h-14
+                            justify-start
+                            rounded-2xl
+                            transition-all
+                            duration-300
+                            active:scale-95
+
+                            ${
+                              isActive(link.to)
+                                ? 'bg-amber-500 text-white shadow-lg'
+                                : 'bg-slate-50 text-slate-700 hover:bg-amber-50'
+                            }
+                          `}
                         >
                           <link.icon className="size-5 mr-3" />
                           {link.label}
@@ -86,36 +174,108 @@ export function Layout({ children }: LayoutProps) {
         </div>
       </header>
 
-      {/* Main Content */}
+      {/* MAIN */}
       <main className="flex-1">
         {children}
       </main>
 
-      {/* Footer */}
-      <footer className="bg-[#754907] text-white py-8 mt-auto">
+      {/* MOBILE FLOATING NAV */}
+      <div className="md:hidden fixed bottom-4 left-1/2 -translate-x-1/2 z-50">
+        <div
+          className="
+            flex items-center gap-1
+            rounded-full
+            border border-white/40
+            bg-white/80
+            backdrop-blur-xl
+            shadow-2xl
+            px-2
+            py-2
+          "
+        >
+          {navLinks.map((link) => (
+            <Link key={link.to} to={link.to}>
+              <Button
+                size="icon"
+                variant="ghost"
+                className={`
+                  h-12
+                  w-12
+                  rounded-full
+                  transition-all
+                  duration-300
+                  active:scale-95
+
+                  ${
+                    isActive(link.to)
+                      ? 'bg-amber-500 text-white shadow-md'
+                      : 'text-slate-600 hover:bg-amber-100'
+                  }
+                `}
+              >
+                <link.icon className="size-5" />
+              </Button>
+            </Link>
+          ))}
+        </div>
+      </div>
+
+      {/* FOOTER */}
+      <footer className="mt-auto bg-gradient-to-r from-slate-900 via-zinc-900 to-slate-800 text-white py-12">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {/* TOPO */}
+          <div className="flex flex-col items-center text-center mb-10">
+            <PawPrint className="size-10 text-amber-400 mb-4" />
+
+            <h3 className="text-2xl font-bold">
+              PetAdopt
+            </h3>
+
+            <p className="text-white/70 mt-2 max-w-md">
+              Conectando animais a famílias amorosas.
+            </p>
+          </div>
+
+          {/* GRID */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
             <div>
-              <h3 className="font-bold text-lg mb-4">Sobre Nós</h3>
-              <p className="text-sm text-white/80">
-                Conectamos animais resgatados com famílias amorosas desde 2020.
+              <h4 className="font-semibold mb-3">
+                Sobre
+              </h4>
+
+              <p className="text-white/70">
+                Plataforma de adoção responsável, ajudando
+                animais resgatados a encontrarem lares seguros.
               </p>
             </div>
+
             <div>
-              <h3 className="font-bold text-lg mb-4">Contato</h3>
-              <p className="text-sm text-white/80">
-                Email: contato@petadopt.com.br<br />
-                Tel: (11) 99999-9999
+              <h4 className="font-semibold mb-3">
+                Contato
+              </h4>
+
+              <p className="text-white/70">
+                contato@petadopt.com.br
+              </p>
+
+              <p className="text-white/70 mt-2">
+                (11) 99999-9999
               </p>
             </div>
+
             <div>
-              <h3 className="font-bold text-lg mb-4">Redes Sociais</h3>
-              <p className="text-sm text-white/80">
-                Instagram | Facebook | Twitter
+              <h4 className="font-semibold mb-3">
+                Comunidade
+              </h4>
+
+              <p className="text-white/70">
+                Instagram • Facebook • X
               </p>
             </div>
           </div>
-          <div className="border-t border-white/20 mt-8 pt-4 text-center text-sm text-white/60">
+
+          {/* COPYRIGHT */}
+          <div className="mt-10 border-t border-white/10 pt-6 text-center text-white/50 text-sm">
             © 2026 PetAdopt. Todos os direitos reservados.
           </div>
         </div>
